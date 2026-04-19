@@ -1,5 +1,6 @@
 // ================= LOGIN =================
 const USER = "admin", PASS = "123456";
+const app = document.getElementById('app'); // Thêm khai báo biến app
 
 function isLoggedIn() {
   return localStorage.getItem("login") === "true";
@@ -42,6 +43,15 @@ function logout() {
 window.onload = function() {
   // Đợi Bootstrap load xong
   setTimeout(() => {
+    // Thêm event listener cho form đăng nhập
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Ngăn form submit mặc định
+        login();
+      });
+    }
+
     if (isLoggedIn()) {
       app.style.display = "block";
       showSection('dashboard');
