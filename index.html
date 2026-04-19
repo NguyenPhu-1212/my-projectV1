@@ -3,6 +3,407 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý Tài Chính Cá Nhân</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- LOGIN MODAL -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="loginModalLabel"><i class="fas fa-lock"></i> Đăng nhập</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="username" class="form-label"><i class="fas fa-user"></i> Tài khoản</label>
+            <input type="text" class="form-control" id="username" placeholder="Nhập tài khoản" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label"><i class="fas fa-key"></i> Mật khẩu</label>
+            <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar" class="bg-dark text-white">
+    <div class="sidebar-header p-3">
+      <h4><i class="fas fa-wallet"></i> Tài Chính</h4>
+    </div>
+    <ul class="list-unstyled components">
+      <li class="active">
+        <a href="#dashboard" class="nav-link" onclick="showSection('dashboard')">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="#transactions" class="nav-link" onclick="showSection('transactions')">
+          <i class="fas fa-list"></i> Giao dịch
+        </a>
+      </li>
+      <li>
+        <a href="#reports" class="nav-link" onclick="showSection('reports')">
+          <i class="fas fa-chart-bar"></i> Báo cáo
+        </a>
+      </li>
+      <li>
+        <a href="#settings" class="nav-link" onclick="showSection('settings')">
+          <i class="fas fa-cog"></i> Cài đặt
+        </a>
+      </li>
+    </ul>
+    <div class="sidebar-footer p-3">
+      <button onclick="logout()" class="btn btn-outline-light w-100">
+        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div id="content">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <button type="button" id="sidebarCollapse" class="btn btn-info">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="ms-auto">
+          <button onclick="toggleDark()" class="btn btn-outline-secondary">
+            <i class="fas fa-moon"></i> Dark Mode
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboard-section" class="section active">
+      <div class="container-fluid">
+        <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+
+        <!-- STATS CARDS -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-arrow-up"></i> Tổng Thu</h5>
+                <h3 id="totalIncome">0₫</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-danger text-white">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-arrow-down"></i> Tổng Chi</h5>
+                <h3 id="totalExpense">0₫</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-info text-white">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-balance-scale"></i> Số dư</h5>
+                <h3 id="balance">0₫</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-calendar-alt"></i> Giao dịch</h5>
+                <h3 id="transactionCount">0</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHART -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-chart-pie"></i> Biểu đồ Thu Chi</h5>
+              </div>
+              <div class="card-body">
+                <canvas id="pieChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Xu hướng 30 ngày</h5>
+              </div>
+              <div class="card-body">
+                <canvas id="lineChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT TRANSACTIONS -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-clock"></i> Giao dịch gần đây</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped" id="recentTransactionsTable">
+                    <thead>
+                      <tr>
+                        <th>Ngày</th>
+                        <th>Loại</th>
+                        <th>Danh mục</th>
+                        <th>Số tiền</th>
+                        <th>Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS SECTION -->
+    <div id="transactions-section" class="section">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2><i class="fas fa-list"></i> Quản lý Giao dịch</h2>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+            <i class="fas fa-plus"></i> Thêm giao dịch
+          </button>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <input type="date" class="form-control" id="filterDate" placeholder="Lọc theo ngày">
+              </div>
+              <div class="col-md-3">
+                <input type="month" class="form-control" id="filterMonth" placeholder="Lọc theo tháng">
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="filterType">
+                  <option value="">Tất cả loại</option>
+                  <option value="thu">Thu</option>
+                  <option value="chi">Chi</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input type="text" class="form-control" id="search" placeholder="Tìm kiếm danh mục">
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-12">
+                <button onclick="applyFilters()" class="btn btn-info me-2"><i class="fas fa-filter"></i> Áp dụng</button>
+                <button onclick="clearFilters()" class="btn btn-secondary me-2"><i class="fas fa-times"></i> Xóa lọc</button>
+                <button onclick="exportToPDF()" class="btn btn-success"><i class="fas fa-download"></i> Xuất PDF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRANSACTIONS TABLE -->
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover" id="transactionsTable">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Ngày</th>
+                    <th>Loại</th>
+                    <th>Danh mục</th>
+                    <th>Số tiền</th>
+                    <th>Ghi chú</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS SECTION -->
+    <div id="reports-section" class="section">
+      <div class="container-fluid">
+        <h2 class="mb-4"><i class="fas fa-chart-bar"></i> Báo cáo</h2>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5>Báo cáo theo danh mục</h5>
+              </div>
+              <div class="card-body">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5>Báo cáo theo tháng</h5>
+              </div>
+              <div class="card-body">
+                <canvas id="monthlyChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div id="settings-section" class="section">
+      <div class="container-fluid">
+        <h2 class="mb-4"><i class="fas fa-cog"></i> Cài đặt</h2>
+
+        <div class="card">
+          <div class="card-body">
+            <h5>Xuất dữ liệu</h5>
+            <button onclick="exportToCSV()" class="btn btn-primary me-2"><i class="fas fa-file-csv"></i> Xuất CSV</button>
+            <button onclick="exportToJSON()" class="btn btn-info"><i class="fas fa-file-code"></i> Xuất JSON</button>
+
+            <hr>
+
+            <h5>Nhập dữ liệu</h5>
+            <input type="file" id="importFile" class="form-control mb-2" accept=".json,.csv">
+            <button onclick="importData()" class="btn btn-warning"><i class="fas fa-upload"></i> Nhập dữ liệu</button>
+
+            <hr>
+
+            <h5>Xóa tất cả dữ liệu</h5>
+            <button onclick="clearAllData()" class="btn btn-danger"><i class="fas fa-trash"></i> Xóa tất cả</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD TRANSACTION MODAL -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTransactionModalLabel"><i class="fas fa-plus"></i> Thêm giao dịch</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="transactionForm">
+          <div class="mb-3">
+            <label for="transactionType" class="form-label">Loại giao dịch</label>
+            <select class="form-select" id="transactionType" onchange="updateCategory()" required>
+              <option value="thu">Thu</option>
+              <option value="chi">Chi</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="transactionAmount" class="form-label">Số tiền</label>
+            <input type="number" class="form-control" id="transactionAmount" placeholder="Nhập số tiền" min="0" required>
+          </div>
+          <div class="mb-3">
+            <label for="transactionCategory" class="form-label">Danh mục</label>
+            <select class="form-select" id="transactionCategory" required></select>
+          </div>
+          <div class="mb-3">
+            <label for="transactionDate" class="form-label">Ngày</label>
+            <input type="date" class="form-control" id="transactionDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="transactionNote" class="form-label">Ghi chú</label>
+            <textarea class="form-control" id="transactionNote" rows="3" placeholder="Ghi chú (tùy chọn)"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" onclick="saveTransaction()">Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TRANSACTION MODAL -->
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTransactionModalLabel"><i class="fas fa-edit"></i> Sửa giao dịch</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editTransactionForm">
+          <input type="hidden" id="editIndex">
+          <div class="mb-3">
+            <label for="editTransactionType" class="form-label">Loại giao dịch</label>
+            <select class="form-select" id="editTransactionType" onchange="updateEditCategory()" required>
+              <option value="thu">Thu</option>
+              <option value="chi">Chi</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editTransactionAmount" class="form-label">Số tiền</label>
+            <input type="number" class="form-control" id="editTransactionAmount" placeholder="Nhập số tiền" min="0" required>
+          </div>
+          <div class="mb-3">
+            <label for="editTransactionCategory" class="form-label">Danh mục</label>
+            <select class="form-select" id="editTransactionCategory" required></select>
+          </div>
+          <div class="mb-3">
+            <label for="editTransactionDate" class="form-label">Ngày</label>
+            <input type="date" class="form-control" id="editTransactionDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="editTransactionNote" class="form-label">Ghi chú</label>
+            <textarea class="form-control" id="editTransactionNote" rows="3" placeholder="Ghi chú (tùy chọn)"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" onclick="updateTransaction()">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quản lý tài chính</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="style.css">
