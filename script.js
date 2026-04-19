@@ -41,10 +41,6 @@ window.onload = function() {
   }, 100);
 };
 
-// ================= DATA =================
-let transactions = JSON.parse(localStorage.getItem("finance")) || [];
-let pieChart, lineChart, categoryChart, monthlyChart;
-
 // ================= CATEGORIES =================
 const categories = {
   thu: ["Khô gà", "Khô bò", "Mực rim", "Bánh gấu", "Dâu sấy", "Mít sấy", "Heo quay", "Khác"],
