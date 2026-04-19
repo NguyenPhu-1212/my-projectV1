@@ -61,78 +61,18 @@
     <!-- DASHBOARD SECTION -->
     <div id="dashboard-section" class="section active">
       <div class="container-fluid">
-        <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
-
-        <!-- STATS CARDS -->
-        <div class="row mb-4">
-          <div class="col-md-3">
-            <div class="card bg-success text-white">
-              <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-arrow-up"></i> Tổng Thu</h5>
-                <h3 id="totalIncome">0₫</h3>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card bg-danger text-white">
-              <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-arrow-down"></i> Tổng Chi</h5>
-                <h3 id="totalExpense">0₫</h3>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card bg-info text-white">
-              <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-balance-scale"></i> Số dư</h5>
-                <h3 id="balance">0₫</h3>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card bg-warning text-white">
-              <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-calendar-alt"></i> Giao dịch</h5>
-                <h3 id="transactionCount">0</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CHART -->
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-header">
-                <h5><i class="fas fa-chart-pie"></i> Biểu đồ Thu Chi</h5>
-              </div>
-              <div class="card-body">
-                <canvas id="pieChart"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-header">
-                <h5><i class="fas fa-chart-line"></i> Xu hướng 30 ngày</h5>
-              </div>
-              <div class="card-body">
-                <canvas id="lineChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
+        <h2 class="mb-4 festival-title"><i class="fas fa-tachometer-alt"></i> Dashboard - Chúc mừng ngày 30/4 & 1/5!</h2>
 
         <!-- RECENT TRANSACTIONS -->
-        <div class="row mt-4">
+        <div class="row">
           <div class="col-12">
-            <div class="card">
-              <div class="card-header">
+            <div class="card festival-card">
+              <div class="card-header festival-header">
                 <h5><i class="fas fa-clock"></i> Giao dịch gần đây</h5>
               </div>
               <div class="card-body">
                 <div class="table-responsive">
-                  <table class="table table-striped" id="recentTransactionsTable">
+                  <table class="table table-striped festival-table" id="recentTransactionsTable">
                     <thead>
                       <tr>
                         <th>Ngày</th>

@@ -1,6 +1,5 @@
 // ================= DATA =================
 let transactions = JSON.parse(localStorage.getItem("finance")) || [];
-let pieChart, lineChart, categoryChart, monthlyChart;
 
 window.onload = function() {
   // Đợi Bootstrap load xong
@@ -130,129 +129,7 @@ document.getElementById('sidebarCollapse').addEventListener('click', function() 
 
 // ================= DASHBOARD =================
 function updateDashboard() {
-  let totalIncome = 0, totalExpense = 0, balance = 0;
-
-  transactions.forEach(t => {
-    if (t.type === "thu") {
-      totalIncome += t.amount;
-      balance += t.amount;
-    } else {
-      totalExpense += t.amount;
-      balance -= t.amount;
-    }
-  });
-
-  document.getElementById('totalIncome').textContent = totalIncome.toLocaleString("vi-VN") + "₫";
-  document.getElementById('totalExpense').textContent = totalExpense.toLocaleString("vi-VN") + "₫";
-  document.getElementById('balance').textContent = balance.toLocaleString("vi-VN") + "₫";
-  document.getElementById('transactionCount').textContent = transactions.length;
-
-  updatePieChart(totalIncome, totalExpense);
-  updateLineChart();
   renderRecentTransactions();
-}
-
-function updatePieChart(income, expense) {
-  const ctx = document.getElementById('pieChart').getContext('2d');
-
-  if (pieChart) pieChart.destroy();
-
-  pieChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['Thu', 'Chi'],
-      datasets: [{
-        data: [income, expense],
-        backgroundColor: ['#27ae60', '#e74c3c'],
-        borderColor: ['#fff', '#fff'],
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'bottom' },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.label + ': ' + context.parsed.toLocaleString("vi-VN") + '₫';
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-function updateLineChart() {
-  const ctx = document.getElementById('lineChart').getContext('2d');
-
-  if (lineChart) lineChart.destroy();
-
-  // Get last 30 days data
-  const last30Days = [];
-  const today = new Date();
-
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    last30Days.push(dateStr);
-  }
-
-  const incomeData = last30Days.map(date => {
-    return transactions
-      .filter(t => t.date === date && t.type === 'thu')
-      .reduce((sum, t) => sum + t.amount, 0);
-  });
-
-  const expenseData = last30Days.map(date => {
-    return transactions
-      .filter(t => t.date === date && t.type === 'chi')
-      .reduce((sum, t) => sum + t.amount, 0);
-  });
-
-  lineChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: last30Days.map(date => new Date(date).toLocaleDateString('vi-VN')),
-      datasets: [{
-        label: 'Thu',
-        data: incomeData,
-        borderColor: '#27ae60',
-        backgroundColor: 'rgba(39, 174, 96, 0.1)',
-        tension: 0.4
-      }, {
-        label: 'Chi',
-        data: expenseData,
-        borderColor: '#e74c3c',
-        backgroundColor: 'rgba(231, 76, 60, 0.1)',
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return value.toLocaleString("vi-VN") + '₫';
-            }
-          }
-        }
-      },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.dataset.label + ': ' + context.parsed.y.toLocaleString("vi-VN") + '₫';
-            }
-          }
-        }
-      }
-    }
-  });
 }
 
 function renderRecentTransactions() {
