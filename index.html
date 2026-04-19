@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý tài chính</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox">
+  <div class="login-card">
+    <h2><i class="fas fa-lock"></i> Đăng nhập</h2>
+    <input id="username" placeholder="Tài khoản" type="text">
+    <input id="password" type="password" placeholder="Mật khẩu">
+    <button onclick="login()" class="login-btn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="container" id="app" style="display:none;">
+
+  <header class="header">
+    <h1><i class="fas fa-wallet"></i> Quản lý tài chính</h1>
+    <div class="header-buttons">
+      <button onclick="toggleDark()" class="btn-secondary"><i class="fas fa-moon"></i> Dark</button>
+      <button onclick="logout()" class="btn-secondary"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </header>
+
+  <section class="form-section">
+    <h3><i class="fas fa-plus-circle"></i> Nhập giao dịch</h3>
+    <div class="form-grid">
+      <select id="type" onchange="updateCategory()">
+        <option value="thu">Thu</option>
+        <option value="chi">Chi</option>
+      </select>
+      <input id="amount" type="number" placeholder="Số tiền" min="0">
+      <select id="category"></select>
+      <input id="date" type="date">
+    </div>
+    <button class="add-btn" onclick="addTransaction()"><i class="fas fa-plus"></i> Thêm giao dịch</button>
+  </section>
+
+  <section class="filter-section">
+    <h3><i class="fas fa-filter"></i> Lọc dữ liệu</h3>
+    <div class="filter-grid">
+      <div class="filter-group">
+        <input id="filterDate" type="date">
+        <button onclick="filterData()" class="btn-primary"><i class="fas fa-calendar-day"></i> Theo ngày</button>
+      </div>
+      <div class="filter-group">
+        <input id="filterMonth" type="month">
+        <button onclick="filterByMonth()" class="btn-primary"><i class="fas fa-calendar-alt"></i> Theo tháng</button>
+      </div>
+      <button onclick="render()" class="btn-secondary"><i class="fas fa-list"></i> Tất cả</button>
+    </div>
+    <div class="search-group">
+      <input id="search" placeholder="Tìm theo danh mục">
+      <button onclick="searchData()" class="btn-primary"><i class="fas fa-search"></i> Tìm</button>
+    </div>
+  </section>
+
+  <section class="export-section">
+    <button onclick="exportExcel()" class="btn-success"><i class="fas fa-download"></i> Export CSV</button>
+  </section>
+
+  <section class="summary-section">
+    <div class="summary-card" id="total"></div>
+  </section>
+
+  <section class="chart-section">
+    <h3><i class="fas fa-chart-pie"></i> Biểu đồ thu chi</h3>
+    <div class="chart-container">
+      <canvas id="myChart"></canvas>
+    </div>
+  </section>
+
+  <section class="list-section">
+    <h3><i class="fas fa-list-ul"></i> Danh sách giao dịch</h3>
+    <ul id="list"></ul>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
