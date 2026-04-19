@@ -69,10 +69,24 @@ window.onload = function() {
       });
     }
 
+    // Thêm event listener cho modal thêm giao dịch
+    const addTransactionModal = document.getElementById('addTransactionModal');
+    if (addTransactionModal) {
+      addTransactionModal.addEventListener('show.bs.modal', function() {
+        // Đặt ngày mặc định là hôm nay
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('transactionDate').value = today;
+        document.getElementById('transactionType').value = 'thu';
+        updateCategory();
+      });
+    }
+
     if (isLoggedIn()) {
       app.style.display = "block";
       showSection('dashboard');
       updateDashboard();
+      // Chỉ gọi updateCategory khi đã đăng nhập và elements đã sẵn sàng
+      setTimeout(() => updateCategory(), 200);
     } else {
       const loginModal = new bootstrap.Modal(document.getElementById('loginModal'), {
         backdrop: 'static',
@@ -80,7 +94,6 @@ window.onload = function() {
       });
       loginModal.show();
     }
-    updateCategory();
   }, 100);
 };
 
@@ -95,31 +108,41 @@ const categories = {
 };
 
 function updateCategory() {
-  const typeVal = document.getElementById("transactionType").value;
-  const select = document.getElementById("transactionCategory");
+  const typeSelect = document.getElementById("transactionType");
+  const categorySelect = document.getElementById("transactionCategory");
 
-  select.innerHTML = "";
+  if (!typeSelect || !categorySelect) return; // Kiểm tra elements tồn tại
 
-  categories[typeVal].forEach(c => {
-    const op = document.createElement("option");
-    op.value = c;
-    op.innerText = c;
-    select.appendChild(op);
-  });
+  const typeVal = typeSelect.value || "thu"; // Mặc định là "thu" nếu chưa có giá trị
+  categorySelect.innerHTML = "";
+
+  if (categories[typeVal]) {
+    categories[typeVal].forEach(c => {
+      const op = document.createElement("option");
+      op.value = c;
+      op.innerText = c;
+      categorySelect.appendChild(op);
+    });
+  }
 }
 
 function updateEditCategory() {
-  const typeVal = document.getElementById("editTransactionType").value;
-  const select = document.getElementById("editTransactionCategory");
+  const typeSelect = document.getElementById("editTransactionType");
+  const categorySelect = document.getElementById("editTransactionCategory");
 
-  select.innerHTML = "";
+  if (!typeSelect || !categorySelect) return; // Kiểm tra elements tồn tại
 
-  categories[typeVal].forEach(c => {
-    const op = document.createElement("option");
-    op.value = c;
-    op.innerText = c;
-    select.appendChild(op);
-  });
+  const typeVal = typeSelect.value || "thu"; // Mặc định là "thu" nếu chưa có giá trị
+  categorySelect.innerHTML = "";
+
+  if (categories[typeVal]) {
+    categories[typeVal].forEach(c => {
+      const op = document.createElement("option");
+      op.value = c;
+      op.innerText = c;
+      categorySelect.appendChild(op);
+    });
+  }
 }
 
 // ================= SAVE DATA =================
@@ -294,13 +317,25 @@ function updateLineChart() {
 
 function renderRecentTransactions() {
   const tbody = document.querySelector('#recentTransactionsTable tbody');
+  if (!tbody) return; // Kiểm tra element tồn tại
+
   tbody.innerHTML = '';
 
   const recentTransactions = transactions.slice(-5).reverse();
 
-  recentTransactions.forEach((t, index) => {
+  recentTransactions.forEach((t) => {
+    // Tìm index gốc của transaction này
+    const originalIndex = transactions.findIndex(originalT =>
+      originalT.date === t.date &&
+      originalT.type === t.type &&
+      originalT.category === t.category &&
+      originalT.amount === t.amount &&
+      originalT.note === t.note
+    );
+
+    if (originalIndex === -1) return; // Bỏ qua nếu không tìm thấy
+
     const row = document.createElement('tr');
-    const originalIndex = transactions.length - 1 - index;
 
     row.innerHTML = `
       <td>${new Date(t.date).toLocaleDateString("vi-VN")}</td>
@@ -329,8 +364,23 @@ function saveTransaction() {
   const date = document.getElementById('transactionDate').value;
   const note = document.getElementById('transactionNote').value;
 
-  if (!amount || !date) {
-    alert("Thiếu thông tin!");
+  if (!type || !amount || !category || !date) {
+    alert("Vui lòng điền đầy đủ thông tin!");
+    return;
+  }
+
+  if (amount <= 0) {
+    alert("Số tiền phải lớn hơn 0!");
+    return;
+  }
+
+  // Kiểm tra ngày không được lớn hơn ngày hiện tại
+  const selectedDate = new Date(date);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // Cuối ngày hôm nay
+
+  if (selectedDate > today) {
+    alert("Ngày không được lớn hơn ngày hiện tại!");
     return;
   }
 
@@ -338,13 +388,17 @@ function saveTransaction() {
   transactions.push(transaction);
   saveData();
 
-  // Reset form
+  // Reset form và cập nhật category
   document.getElementById('transactionForm').reset();
-  updateCategory();
+  // Đặt lại giá trị mặc định cho type select và cập nhật category
+  setTimeout(() => {
+    document.getElementById('transactionType').value = 'thu';
+    updateCategory();
+  }, 100);
 
   // Close modal
   const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
-  modal.hide();
+  if (modal) modal.hide();
 
   // Update UI
   updateDashboard();
@@ -374,8 +428,23 @@ function updateTransaction() {
   const date = document.getElementById('editTransactionDate').value;
   const note = document.getElementById('editTransactionNote').value;
 
-  if (!amount || !date) {
-    alert("Thiếu thông tin!");
+  if (!type || !amount || !category || !date) {
+    alert("Vui lòng điền đầy đủ thông tin!");
+    return;
+  }
+
+  if (amount <= 0) {
+    alert("Số tiền phải lớn hơn 0!");
+    return;
+  }
+
+  // Kiểm tra ngày không được lớn hơn ngày hiện tại
+  const selectedDate = new Date(date);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  if (selectedDate > today) {
+    alert("Ngày không được lớn hơn ngày hiện tại!");
     return;
   }
 
@@ -384,7 +453,7 @@ function updateTransaction() {
 
   // Close modal
   const modal = bootstrap.Modal.getInstance(document.getElementById('editTransactionModal'));
-  modal.hide();
+  if (modal) modal.hide();
 
   // Update UI
   updateDashboard();
