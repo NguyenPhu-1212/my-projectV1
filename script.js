@@ -6,17 +6,31 @@ function isLoggedIn() {
 }
 
 function login() {
-  let u = username.value, p = password.value;
+  const username = document.getElementById('username');
+  const password = document.getElementById('password');
+
+  if (!username || !password) {
+    alert("Lỗi: Không tìm thấy form đăng nhập!");
+    return;
+  }
+
+  let u = username.value.trim(), p = password.value.trim();
+
+  console.log("Đang đăng nhập với:", u, p); // Debug
 
   if (u === USER && p === PASS) {
     localStorage.setItem("login", "true");
-    const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-    loginModal.hide();
+    const loginModalEl = document.getElementById('loginModal');
+    const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+    if (loginModal) {
+      loginModal.hide();
+    }
     app.style.display = "block";
     showSection('dashboard');
     updateDashboard();
+    console.log("Đăng nhập thành công!");
   } else {
-    alert("Sai tài khoản!");
+    alert("Sai tài khoản hoặc mật khẩu!");
   }
 }
 
@@ -26,15 +40,21 @@ function logout() {
 }
 
 window.onload = function() {
-  if (isLoggedIn()) {
-    app.style.display = "block";
-    showSection('dashboard');
-    updateDashboard();
-  } else {
-    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-    loginModal.show();
-  }
-  updateCategory();
+  // Đợi Bootstrap load xong
+  setTimeout(() => {
+    if (isLoggedIn()) {
+      app.style.display = "block";
+      showSection('dashboard');
+      updateDashboard();
+    } else {
+      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'), {
+        backdrop: 'static',
+        keyboard: false
+      });
+      loginModal.show();
+    }
+    updateCategory();
+  }, 100);
 };
 
 // ================= DATA =================
