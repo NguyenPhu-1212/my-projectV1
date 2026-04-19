@@ -1,9 +1,62 @@
 // ================= DATA =================
+const USER = "admin", PASS = "123456";
 let transactions = JSON.parse(localStorage.getItem("finance")) || [];
+let categoryChart, monthlyChart;
+
+function isLoggedIn() {
+  return localStorage.getItem("login") === "true";
+}
+
+function login() {
+  const username = document.getElementById('username');
+  const password = document.getElementById('password');
+
+  if (!username || !password) {
+    alert("Lỗi: Không tìm thấy form đăng nhập!");
+    return;
+  }
+
+  let u = username.value.trim(), p = password.value.trim();
+
+  console.log("Đang đăng nhập với:", u, p); // Debug
+
+  if (u === USER && p === PASS) {
+    localStorage.setItem("login", "true");
+    const loginModalEl = document.getElementById('loginModal');
+    const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+    if (loginModal) {
+      loginModal.hide();
+    }
+    document.getElementById('app').style.display = "block";
+    showSection('dashboard');
+    updateDashboard();
+    console.log("Đăng nhập thành công!");
+  } else {
+    alert("Sai tài khoản hoặc mật khẩu!");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("login");
+  location.reload();
+}
 
 window.onload = function() {
+  // Kiểm tra đăng nhập
+  if (!isLoggedIn()) {
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'), {
+      backdrop: 'static',
+      keyboard: false
+    });
+    loginModal.show();
+    return;
+  }
+
   // Đợi Bootstrap load xong
   setTimeout(() => {
+    // Hiển thị app
+    document.getElementById('app').style.display = "block";
+
     // Thêm event listeners cho các form
     const transactionForm = document.getElementById('transactionForm');
     if (transactionForm) {
@@ -33,7 +86,7 @@ window.onload = function() {
       });
     }
 
-    // Hiển thị app luôn
+    // Hiển thị dashboard
     showSection('dashboard');
     updateDashboard();
     updateCategory();
@@ -392,6 +445,8 @@ function updateReports() {
   updateCategoryChart();
   updateMonthlyChart();
 }
+
+function updateCategoryChart() {
   const ctx = document.getElementById('categoryChart').getContext('2d');
 
   if (categoryChart) categoryChart.destroy();
@@ -446,6 +501,7 @@ function updateReports() {
       }
     }
   });
+}
 
 
 function updateMonthlyChart() {
