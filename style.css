@@ -99,6 +99,95 @@ body.dark #loginBox input:focus {
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
+/* ===== MAIN APP LAYOUT ===== */
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+  width: 250px;
+  background: #343a40;
+  color: #fff;
+  transition: all 0.3s;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+#sidebar.active {
+  width: 70px;
+}
+
+#sidebar .sidebar-header {
+  padding: 20px;
+  background: #495057;
+  text-align: center;
+}
+
+#sidebar .sidebar-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+#sidebar ul li {
+  padding: 0;
+}
+
+#sidebar ul li a {
+  padding: 15px 20px;
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid #495057;
+  transition: all 0.3s;
+}
+
+#sidebar ul li a:hover {
+  background: #495057;
+}
+
+#sidebar ul li.active a {
+  background: #667eea;
+}
+
+#sidebar .sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 15px;
+  border-top: 1px solid #495057;
+}
+
+#sidebar.active .sidebar-footer {
+  padding: 15px 10px;
+}
+
+/* ===== MAIN CONTENT ===== */
+#content {
+  flex: 1;
+  margin-left: 250px;
+  transition: margin-left 0.3s;
+}
+
+#content.active {
+  margin-left: 70px;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  display: none;
+  padding: 20px;
+}
+
+.section.active {
+  display: block;
+}
+
 /* ===== CONTAINER ===== */
 .container {
   max-width: 1200px;
@@ -363,6 +452,33 @@ li button:hover {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  #sidebar {
+    width: 70px;
+  }
+
+  #sidebar .sidebar-header h4 {
+    font-size: 1rem;
+  }
+
+  #sidebar ul li a {
+    padding: 15px 10px;
+    text-align: center;
+  }
+
+  #sidebar ul li a i {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+
+  #sidebar ul li a span {
+    display: none;
+  }
+
+  #content {
+    margin-left: 70px;
+  }
+
   .container {
     margin: 10px;
     padding: 15px;

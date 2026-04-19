@@ -52,6 +52,23 @@ window.onload = function() {
       });
     }
 
+    // Thêm event listeners cho các form khác
+    const transactionForm = document.getElementById('transactionForm');
+    if (transactionForm) {
+      transactionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveTransaction();
+      });
+    }
+
+    const editTransactionForm = document.getElementById('editTransactionForm');
+    if (editTransactionForm) {
+      editTransactionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateTransaction();
+      });
+    }
+
     if (isLoggedIn()) {
       app.style.display = "block";
       showSection('dashboard');
@@ -121,12 +138,18 @@ function showSection(sectionName) {
   sidebarLinks.forEach(link => link.classList.remove('active'));
 
   // Show selected section
-  document.getElementById(sectionName + '-section').classList.add('active');
+  const targetSection = document.getElementById(sectionName + '-section');
+  if (targetSection) {
+    targetSection.classList.add('active');
+  }
 
   // Add active class to clicked link
-  event.target.closest('li').classList.add('active');
+  const clickedLink = document.querySelector(`#sidebar a[href="#${sectionName}"]`);
+  if (clickedLink) {
+    clickedLink.closest('li').classList.add('active');
+  }
 
-  // Update dashboard if dashboard is shown
+  // Update content based on section
   if (sectionName === 'dashboard') {
     updateDashboard();
   } else if (sectionName === 'transactions') {
@@ -446,7 +469,16 @@ function renderFilteredTransactions(filteredTransactions) {
   const tbody = document.querySelector('#transactionsTable tbody');
   tbody.innerHTML = '';
 
-  filteredTransactions.forEach((t, index) => {
+  filteredTransactions.forEach((t, filteredIndex) => {
+    // Tìm index gốc trong transactions array
+    const originalIndex = transactions.findIndex(originalT =>
+      originalT.date === t.date &&
+      originalT.type === t.type &&
+      originalT.category === t.category &&
+      originalT.amount === t.amount &&
+      originalT.note === t.note
+    );
+
     const row = document.createElement('tr');
 
     row.innerHTML = `
@@ -456,10 +488,10 @@ function renderFilteredTransactions(filteredTransactions) {
       <td>${t.amount.toLocaleString("vi-VN")}₫</td>
       <td>${t.note || '-'}</td>
       <td>
-        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${index})">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${originalIndex})">
           <i class="fas fa-edit"></i>
         </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${index})">
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${originalIndex})">
           <i class="fas fa-trash"></i>
         </button>
       </td>
@@ -474,8 +506,6 @@ function updateReports() {
   updateCategoryChart();
   updateMonthlyChart();
 }
-
-function updateCategoryChart() {
   const ctx = document.getElementById('categoryChart').getContext('2d');
 
   if (categoryChart) categoryChart.destroy();
@@ -701,19 +731,3 @@ function clearAllData() {
 function toggleDark() {
   document.body.classList.toggle("dark");
 }
-
-// ================= FORM HANDLERS =================
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  login();
-});
-
-document.getElementById('transactionForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  saveTransaction();
-});
-
-document.getElementById('editTransactionForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  updateTransaction();
-});
