@@ -1,4 +1,4 @@
-// ================= LOGIN =================
+// ================= DATA =================
 const USER = "admin", PASS = "123456";
 const app = document.getElementById('app'); // Thêm khai báo biến app
 
@@ -43,16 +43,7 @@ function logout() {
 window.onload = function() {
   // Đợi Bootstrap load xong
   setTimeout(() => {
-    // Thêm event listener cho form đăng nhập
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Ngăn form submit mặc định
-        login();
-      });
-    }
-
-    // Thêm event listeners cho các form khác
+    // Thêm event listeners cho các form
     const transactionForm = document.getElementById('transactionForm');
     if (transactionForm) {
       transactionForm.addEventListener('submit', function(e) {
@@ -81,19 +72,10 @@ window.onload = function() {
       });
     }
 
-    if (isLoggedIn()) {
-      app.style.display = "block";
-      showSection('dashboard');
-      updateDashboard();
-      // Chỉ gọi updateCategory khi đã đăng nhập và elements đã sẵn sàng
-      setTimeout(() => updateCategory(), 200);
-    } else {
-      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'), {
-        backdrop: 'static',
-        keyboard: false
-      });
-      loginModal.show();
-    }
+    // Hiển thị app luôn
+    showSection('dashboard');
+    updateDashboard();
+    updateCategory();
   }, 100);
 };
 
@@ -629,7 +611,7 @@ function updateReports() {
       }
     }
   });
-}
+
 
 function updateMonthlyChart() {
   const ctx = document.getElementById('monthlyChart').getContext('2d');
